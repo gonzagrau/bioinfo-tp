@@ -19,6 +19,8 @@ cd src
 python read_seq.py
 ```
 
+Or, alternatively, simply run `get_fastas.sh`, which will handle dependencies and run the relevant python script. We recommend using a virtual environment for this.
+
 This will:
 1. Read the GenBank file from `../data/lep-sequence.gb`
 2. Extract all CDS features
