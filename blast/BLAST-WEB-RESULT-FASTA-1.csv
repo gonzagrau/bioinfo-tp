@@ -1,0 +1,17 @@
+Description,Scientific Name,Max Score,Total Score,Query Cover,E value,Per. ident,Acc. Len,Accession  
+RecName: Full=Leptin; AltName: Full=Obese protein; AltName: Full=Obesity factor; Flags: Precursor [Homo sapiens],Homo sapiens,340,340,100%,6e-121,100.00,167,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/P41159.1?report=genbank&log$=prottop&blast_rank=1&RID=1MSJGDV5013"",""P41159.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor [Pan troglodytes],Pan troglodytes,291,291,87%,7e-102,99.32,146,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/O02750.1?report=genbank&log$=prottop&blast_rank=2&RID=1MSJGDV5013"",""O02750.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor [Gorilla gorilla gorilla],Gorilla gorilla gorilla,289,289,87%,6e-101,98.63,146,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q95189.1?report=genbank&log$=prottop&blast_rank=3&RID=1MSJGDV5013"",""Q95189.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor [Pongo pygmaeus],Pongo pygmaeus,287,287,87%,4e-100,97.26,146,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q95234.1?report=genbank&log$=prottop&blast_rank=4&RID=1MSJGDV5013"",""Q95234.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor; Flags: Precursor [Macaca mulatta],Macaca mulatta,306,306,100%,2e-107,89.82,167,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q28504.1?report=genbank&log$=prottop&blast_rank=5&RID=1MSJGDV5013"",""Q28504.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor; Flags: Precursor [Equus caballus],Equus caballus,236,236,77%,7e-80,88.37,145,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q9TU09.2?report=genbank&log$=prottop&blast_rank=6&RID=1MSJGDV5013"",""Q9TU09.2"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor [Ovis aries],Ovis aries,256,256,87%,6e-88,86.99,146,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q28603.2?report=genbank&log$=prottop&blast_rank=7&RID=1MSJGDV5013"",""Q28603.2"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor; Flags: Precursor [Sus scrofa],Sus scrofa,286,286,100%,3e-99,85.03,167,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q29406.1?report=genbank&log$=prottop&blast_rank=8&RID=1MSJGDV5013"",""Q29406.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor; Flags: Precursor [Felis catus],Felis catus,289,289,100%,1e-100,84.43,167,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/Q9N2C1.1?report=genbank&log$=prottop&blast_rank=9&RID=1MSJGDV5013"",""Q9N2C1.1"")"
+RecName: Full=Leptin; AltName: Full=Obesity factor; Flags: Precursor [Bos taurus],Bos taurus,284,284,100%,1e-98,84.43,167,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/protein/P50595.1?report=genbank&log$=prottop&blast_rank=10&RID=1MSJGDV5013"",""P50595.1"")"
+
+
+
+		
+
+
