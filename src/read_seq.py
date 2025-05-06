@@ -53,7 +53,7 @@ def extract_cds_features(record):
     return cds_features
 
 
-def save_cds_data(cds_features, record_name, output_dir="output"):
+def save_cds_data(cds_features, record_name, output_dir="../output/fastas"):
     """
     Processes and saves coding sequence (CDS) features and their associated data for a specified record into files.
     It creates two FASTA files containing both CDS sequences and their translations, and also a CSV file with CDS
