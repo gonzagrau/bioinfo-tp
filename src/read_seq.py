@@ -1,5 +1,4 @@
-from Bio import GenBank, SeqIO
-from Bio.Seq import Seq
+from Bio import SeqIO
 import pandas as pd
 import os
 
@@ -19,7 +18,7 @@ def extract_cds_features(record):
     for feature in record.features:
         if feature.type == "CDS":
             # Handle split locations (introns/exons)
-            if hasattr(feature.location, 'parts'):
+            if hasattr(feature.location, "parts"):
                 locations = []
                 for part in feature.location.parts:
                     locations.append(f"{part.start}..{part.end}")
@@ -30,29 +29,31 @@ def extract_cds_features(record):
             # Extract metadata
             cds_seq = feature.location.extract(record.seq)
             qualifiers = feature.qualifiers
-            gene_name = qualifiers.get('gene', ['Unknown'])[0]
-            product = qualifiers.get('product', ['Unknown'])[0]
-            protein_id = qualifiers.get('protein_id', ['Unknown'])[0]
+            gene_name = qualifiers.get("gene", ["Unknown"])[0]
+            product = qualifiers.get("product", ["Unknown"])[0]
+            protein_id = qualifiers.get("protein_id", ["Unknown"])[0]
 
             # Get translation, ideally from qualifiers, if available
-            if 'translation' in qualifiers:
-                translation = qualifiers['translation'][0]
+            if "translation" in qualifiers:
+                translation = qualifiers["translation"][0]
             else:
                 translation = cds_seq.translate()
 
-            cds_features.append({
-                'gene': gene_name,
-                'location': location_str,
-                'product': product,
-                'protein_id': protein_id,
-                'cds_sequence': str(cds_seq),
-                'translation': str(translation)
-            })
+            cds_features.append(
+                {
+                    "gene": gene_name,
+                    "location": location_str,
+                    "product": product,
+                    "protein_id": protein_id,
+                    "cds_sequence": str(cds_seq),
+                    "translation": str(translation),
+                }
+            )
 
     return cds_features
 
 
-def save_cds_data(cds_features, record_name, output_dir='output'):
+def save_cds_data(cds_features, record_name, output_dir="output"):
     """
     Processes and saves coding sequence (CDS) features and their associated data for a specified record into files.
     It creates two FASTA files containing both CDS sequences and their translations, and also a CSV file with CDS
@@ -72,15 +73,19 @@ def save_cds_data(cds_features, record_name, output_dir='output'):
     df.to_csv(f"{output_dir}/{record_name}_cds_features.csv", index=False)
 
     # Save sequences to FASTA files
-    with open(f"{output_dir}/{record_name}_cds_sequences.fasta", 'w') as f:
+    with open(f"{output_dir}/{record_name}_cds_sequences.fasta", "w") as f:
         for i, feature in enumerate(cds_features):
-            f.write(f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n")
+            f.write(
+                f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n"
+            )
             f.write(f"{feature['cds_sequence']}\n")
 
     # Save translations to FASTA files
-    with open(f"{output_dir}/{record_name}_protein_sequences.fasta", 'w') as f:
+    with open(f"{output_dir}/{record_name}_protein_sequences.fasta", "w") as f:
         for i, feature in enumerate(cds_features):
-            f.write(f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n")
+            f.write(
+                f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n"
+            )
             f.write(f"{feature['translation']}\n")
 
 
@@ -111,6 +116,7 @@ def main():
         # Save data to files
         save_cds_data(cds_features, record_name)
         print(f"CDS data saved to the 'output' directory.")
+
 
 if __name__ == "__main__":
     main()
