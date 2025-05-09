@@ -72,23 +72,21 @@ def save_cds_data(cds_features, record_name, output_dir="../output/fastas"):
     df = pd.DataFrame(cds_features)
     df.to_csv(f"{output_dir}/{record_name}_cds_features.csv", index=False)
 
-    # now: one file per CDS *and* one per protein
-    for i, feature in enumerate(cds_features, start=1):
-        # build a safe filename: include record, index or protein_id
-        base = f"{record_name}_{feature['protein_id']}"
-        
-        # write the CDS sequence
-        cds_path = os.path.join(output_dir, f"{base}_cds.fasta")
-        with open(cds_path, "w") as f_cds:
-            header = f">{feature['gene']}|{feature['protein_id']}|{feature['product']}"
-            f_cds.write(header + "\n")
-            f_cds.write(feature['cds_sequence'] + "\n")
+    # Save sequences to FASTA files
+    with open(f"{output_dir}/{record_name}_cds_sequences.fasta", "w") as f:
+        for i, feature in enumerate(cds_features):
+            f.write(
+                f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n"
+            )
+            f.write(f"{feature['cds_sequence']}\n")
 
-        # write the translated protein
-        prot_path = os.path.join(output_dir, f"{base}_protein.fasta")
-        with open(prot_path, "w") as f_prot:
-            f_prot.write(header + "\n")
-            f_prot.write(feature['translation'] + "\n")
+    # Save translations to FASTA files
+    with open(f"{output_dir}/{record_name}_protein_sequences.fasta", "w") as f:
+        for i, feature in enumerate(cds_features):
+            f.write(
+                f">{feature['gene']}|{feature['protein_id']}|{feature['product']}\n"
+            )
+            f.write(f"{feature['translation']}\n")
 
 
 def main():
