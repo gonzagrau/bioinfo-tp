@@ -1,0 +1,69 @@
+
+### ORF: nc_000007_92
+########################################
+# Program: patmatmotifs
+# Rundate: Tue  3 Jun 2025 17:17:49
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/nc_000007_92.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/nc_000007_92_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/nc_000007_92_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: NC_000007_92     from: 1   to: 128
+# HitCount: 4
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+Length = 22
+Start = position 107 of sequence
+End = position 128 of sequence
+
+Motif = LEUCINE_ZIPPER
+
+QKALGLPGSSPSLPGSRNALGIRGPGL
+     |                    |
+   107                    128
+
+Length = 22
+Start = position 100 of sequence
+End = position 121 of sequence
+
+Motif = LEUCINE_ZIPPER
+
+YLETPLFQKALGLPGSSPSLPGSRNALGIRGP
+     |                    |
+   100                    121
+
+Length = 22
+Start = position 75 of sequence
+End = position 96 of sequence
+
+Motif = LEUCINE_ZIPPER
+
+LHTPNLPTKQASLCRQFTSLTSFKLYLETPLF
+     |                    |
+    75                    96
+
+Length = 22
+Start = position 68 of sequence
+End = position 89 of sequence
+
+Motif = LEUCINE_ZIPPER
+
+LTLLPLHLHTPNLPTKQASLCRQFTSLTSFKL
+     |                    |
+    68                    89
+
+
+#---------------------------------------
+#---------------------------------------
+
+
+

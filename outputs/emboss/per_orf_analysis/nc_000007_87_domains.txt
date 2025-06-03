@@ -1,0 +1,34 @@
+########################################
+# Program: patmatmotifs
+# Rundate: Tue  3 Jun 2025 17:17:49
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/nc_000007_87.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/nc_000007_87_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/nc_000007_87_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: NC_000007_87     from: 1   to: 67
+# HitCount: 1
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+Length = 3
+Start = position 65 of sequence
+End = position 67 of sequence
+
+Motif = MICROBODIES_CTER
+
+AERGGGRL
+     | |
+    65 67
+
+
+#---------------------------------------
+#---------------------------------------
