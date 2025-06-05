@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
 ########################################################################
 # (1) Get the environment ready: install tools, configure EMBOSS, etc.
 ########################################################################
@@ -10,44 +9,44 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# #---- 1.1 Install (or confirm) required packages ----
-# #      emboss (includes getorf, patmatmotifs, seqret, prosextract, etc.)
-# #      emboss-data (for built‐in DBs, though we'll override PROSITE)
-# #      wget       (to fetch PROSITE files)
-# echo "### Installing required packages (if not already present)..."
-# sudo apt-get update -qq
-# sudo apt-get install -y emboss emboss-data wget tree
-#
-# #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
-# #      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
-# export EMBOSS_DATA="$HOME/emboss_data"
-# PROSITE_DIR="$EMBOSS_DATA/PROSITE"
-# mkdir -p "$PROSITE_DIR"
-#
-# #---- 1.3 Download PROSITE if not already there ----
-# cd "$PROSITE_DIR"
-# if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
-#   echo "### Downloading PROSITE database..."
-#   wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
-#   wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
-# else
-#   echo "### PROSITE files already present, skipping download."
-# fi
-#
-# #---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
-# echo "### Running prosextract to process PROSITE..."
-# # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
-# prosextract >/dev/null
-#
-# #----1.5 installing blast and downloading Swiss‐Prot database ----
-# if ! command -v blastp &> /dev/null; then
-#   echo "### Installing BLAST+..."
-#   sudo apt-get install -y ncbi-blast+
-# else
-#   echo "### BLAST+ already installed."
-# fi
-#
-# # Check if Swiss‐Prot database exists, if not, download it
+ #---- 1.1 Install (or confirm) required packages ----
+ #      emboss (includes getorf, patmatmotifs, seqret, prosextract, etc.)
+ #      emboss-data (for built‐in DBs, though we'll override PROSITE)
+ #      wget       (to fetch PROSITE files)
+ echo "### Installing required packages (if not already present)..."
+ sudo apt-get update -qq
+ sudo apt-get install -y emboss emboss-data wget
+
+ #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
+ #      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
+ export EMBOSS_DATA="$HOME/emboss_data"
+ PROSITE_DIR="$EMBOSS_DATA/PROSITE"
+ mkdir -p "$PROSITE_DIR"
+
+ #---- 1.3 Download PROSITE if not already there ----
+ cd "$PROSITE_DIR"
+ if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
+   echo "### Downloading PROSITE database..."
+   wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
+   wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
+ else
+   echo "### PROSITE files already present, skipping download."
+ fi
+
+ #---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
+ echo "### Running prosextract to process PROSITE..."
+ # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
+ prosextract >/dev/null
+
+ #----1.5 installing blast and downloading Swiss‐Prot database ----
+ if ! command -v blastp &> /dev/null; then
+   echo "### Installing BLAST+..."
+   sudo apt-get install -y ncbi-blast+
+ else
+   echo "### BLAST+ already installed."
+ fi
+
+#----1.6 Check if Swiss‐Prot database exists, if not, download it
 SWISSPROT_DIR="../../data/swissprot"
 if [[ ! -d "$SWISSPROT_DIR" ]]; then
   echo "### Downloading Swiss‐Prot database..."
@@ -58,9 +57,11 @@ if [[ ! -d "$SWISSPROT_DIR" ]]; then
 else
   echo "### Swiss‐Prot database already present."
 fi
+export BLASTDB="$(realpath "$SWISSPROT_DIR")"
 
-# Go back to main dir
+#----1.7 Set up the script to run from its own directory ----
 cd "$SCRIPT_DIR"
+
 ########################################################################
 # (2) Initialize global variables (paths for input/output)
 ########################################################################
@@ -85,12 +86,13 @@ DOMAIN_OUT_DIR="../../outputs/emboss/per_orf_analysis"
 # Remove and make the directory fresh
 rm -rf "$DOMAIN_OUT_DIR"
 mkdir -p "$DOMAIN_OUT_DIR"
-# 2.6 File to collect all domain‐scan results in one place
-COMBINED_RESULTS="../../outputs/emboss/full_domain_analysis.txt"
+
+# 2.6 File to collect relevant domain‐scan results in one place
+COMBINED_RESULTS="../../outputs/emboss/domain_analysis.txt"
 
 # 2.7 Configuration parameters
 MIN_ORF_SIZE_NT=150      # Minimum size for ORFs in nucleotides
-MIN_MOTIF_LENGTH=10      # Minimum length to consider a motif "long"
+MIN_MOTIF_LENGTH=8      # Minimum length to consider a motif "long"
 MIN_HIT_COUNT=0          # Minimum number of hits required to report an ORF
 
 if [[ ! -f "$GENBANK_IN" ]]; then
@@ -113,7 +115,6 @@ echo "   → Full-sequence FASTA written to: $FULLFASTA"
 ########################################################################
 
 echo "### Extracting ORFs from $FULLFASTA..."
-# getorf finds all ORFs and writes them as translated protein sequences.
 getorf \
   -sequence "$FULLFASTA" \
   -outseq "$ORF_FASTA" \
@@ -123,7 +124,7 @@ getorf \
 echo "   → Translated ORFs written to: $ORF_FASTA"
 
 ########################################################################
-# (5) Run patmatmotifs on each extracted ORF
+# (5) Run BLAST on the longest ORF
 ########################################################################
 
 # Step 5.1: Split the multi-FASTA ORF file into individual FASTAs
@@ -136,9 +137,45 @@ seqretsplit \
 mv ./*.fasta "$ORF_SPLIT_DIR"
 echo "   → Individual ORF FASTAs in: $ORF_SPLIT_DIR"
 
-tree $ORF_SPLIT_DIR
-# Step 5.2: For each ORF FASTA, run patmatmotifs and save to DOMAIN_OUT_DIR
+# Step 5.2: Find the longest ORF FASTA file
+LONGEST_ORF_FASTA=$(find "$ORF_SPLIT_DIR" -name '*.fasta' -exec awk '
+  BEGIN { max_len=0; longest="" }
+  FNR==1 { seq_len=0 }
+  /^>/ { next }
+  { seq_len += length($0) }
+  ENDFILE {
+    if (seq_len > max_len) {
+      max_len = seq_len
+      longest = FILENAME
+    }
+  }
+  END { print longest }
+' {} +)
+
+echo "Longest ORF found: $LONGEST_ORF_FASTA"
+LONGEST_ORF_BLAST_OUT="../../outputs/emboss/longest_orf_blast.tsv"
+
+# Step 5.3: Run BLASTp on the longest ORF against Swiss‐Prot database
+blastp \
+  -query "$LONGEST_ORF_FASTA" \
+  -db "swissprot" \
+  -out "$LONGEST_ORF_BLAST_OUT" \
+  -evalue 1e-5 \
+  -outfmt '6 qseqid sseqid pident length evalue bitscore'
+
+# Step 5.4: Format the BLAST output for better readability
+sed '1i qseqid\tsseqid\tpident\tlength\tevalue\tbitscore' "$LONGEST_ORF_BLAST_OUT" | \
+  column -t -s $'\t' > "${LONGEST_ORF_BLAST_OUT}.tmp"
+mv "${LONGEST_ORF_BLAST_OUT}.tmp" "$LONGEST_ORF_BLAST_OUT"
+
+echo "   → BLASTp results for longest ORF: $LONGEST_ORF_BLAST_OUT"
+
+
+########################################################################
+# (6) Run patmatmotifs on all ORFs and collect results
+########################################################################
 echo "### Running patmatmotifs on each ORF..."
+
 # Clear combined results file (we’ll append as we go)
 echo "" > "$COMBINED_RESULTS"
 
@@ -169,41 +206,6 @@ done
 echo "   → Per-ORF domain reports in: $DOMAIN_OUT_DIR"
 echo "   → All domain results merged in: $COMBINED_RESULTS"
 
-
-# Find the file with the longest ORF sequence (based on total length)
-LONGEST_ORF_FASTA=$(find "$ORF_SPLIT_DIR" -name '*.fasta' -exec awk '
-  BEGIN { max_len=0; longest="" }
-  FNR==1 { seq_len=0 } 
-  /^>/ { next } 
-  { seq_len += length($0) } 
-  ENDFILE {
-    if (seq_len > max_len) {
-      max_len = seq_len
-      longest = FILENAME
-    }
-  } 
-  END { print longest }
-' {} +)
-
-echo "Longest ORF found: $LONGEST_ORF_FASTA"
-LONGEST_ORF_BLAST_OUT="../../outputs/emboss/longest_orf_blast.tsv"
-
-# Run BLASTp for the longest ORF
-export BLASTDB="$(realpath "$SWISSPROT_DIR")"
-blastp \
-  -query "$LONGEST_ORF_FASTA" \
-  -db "swissprot" \
-  -out "$LONGEST_ORF_BLAST_OUT" \
-  -evalue 1e-5 \
-  -outfmt '6 qseqid sseqid pident length evalue bitscore'
-
-# Add header and align columns
-sed '1i qseqid\tsseqid\tpident\tlength\tevalue\tbitscore' "$LONGEST_ORF_BLAST_OUT" | \
-  column -t -s $'\t' > "${LONGEST_ORF_BLAST_OUT}.tmp"
-mv "${LONGEST_ORF_BLAST_OUT}.tmp" "$LONGEST_ORF_BLAST_OUT"
-
-echo "   → BLASTp results for longest ORF: $LONGEST_ORF_BLAST_OUT"
-
 ########################################################################
 # () Done
 ########################################################################
@@ -212,9 +214,7 @@ echo "### Pipeline complete!"
 echo "  1. Full-sequence FASTA:      $FULLFASTA"
 echo "  2. Translated ORFs:          $ORF_FASTA"
 echo "  3. Split ORFs:               $ORF_SPLIT_DIR"
-echo "  4. Per-ORF domain reports:   $DOMAIN_OUT_DIR"
-echo "  5. Combined domain results:  $COMBINED_RESULTS"
-echo "  6. Longest ORF BLASTp:       $LONGEST_ORF_BLAST_OUT"
-
-
-#Look for the longest orf inside the ORF_SPLIT_DIR 
+echo "  4. Per-ORF domain reports:    $DOMAIN_OUT_DIR"
+echo "  5. Combined domain results:   $COMBINED_RESULTS"
+echo "  6. Longest ORF BLAST results: $LONGEST_ORF_BLAST_OUT (if BLAST was run)"
+echo "### All outputs are in the 'outputs/emboss' directory."

@@ -2,7 +2,7 @@
 ### ORF: xx894275_55
 ########################################
 # Program: patmatmotifs
-# Rundate: Thu  5 Jun 2025 16:43:46
+# Rundate: Thu  5 Jun 2025 17:31:47
 # Commandline: patmatmotifs
 #    -sequence ../../outputs/emboss/orf_splits/xx894275_55.fasta
 #    -outfile ../../outputs/emboss/per_orf_analysis/xx894275_55_domains.txt
@@ -40,6 +40,44 @@ Motif = LEUCINE_ZIPPER
 LWLTAGLRSLLRQLTPLRVWTGSLPSCPS
   |                    |
   3                    24
+
+
+#---------------------------------------
+#---------------------------------------
+
+
+
+### ORF: xx894275_9
+########################################
+# Program: patmatmotifs
+# Rundate: Thu  5 Jun 2025 17:31:47
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/xx894275_9.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/xx894275_9_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/xx894275_9_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: XX894275_9     from: 1   to: 1007
+# HitCount: 1
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+Length = 9
+Start = position 677 of sequence
+End = position 685 of sequence
+
+Motif = DNA_POLYMERASE_B
+
+KFNVLYGDTDSTFVLPTFN
+     |       |
+   677       685
 
 
 #---------------------------------------

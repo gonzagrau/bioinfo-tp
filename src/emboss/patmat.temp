@@ -1,0 +1,31 @@
+# Step 5.2: For each ORF FASTA, run patmatmotifs and save to DOMAIN_OUT_DIR
+echo "### Running patmatmotifs on each ORF..."
+# Clear combined results file (we’ll append as we go)
+echo "" > "$COMBINED_RESULTS"
+
+for orffile in "$ORF_SPLIT_DIR"/*.fasta; do
+  base="$(basename "$orffile" .fasta)"
+  outfile="$DOMAIN_OUT_DIR/${base}_domains.txt"
+
+  # Run patmatmotifs: no need to specify -datafile, since EMBOSS_DATA is set
+  patmatmotifs \
+    -sequence "$orffile" \
+    -outfile "$outfile" \
+    >/dev/null
+
+  # Extract the HitCount value from the output file
+  hit_count=$(grep -m 1 "# HitCount:" "$outfile" | awk '{print $3}')
+  has_long_motif=$(awk '/Length = / {if ($3 > '"$MIN_MOTIF_LENGTH"') print "yes"; exit}' "$outfile")
+
+  # Only append to the combined results file if hitcount > minimal threshold and has long motif
+  if [[ "$hit_count" -gt "$MIN_HIT_COUNT" ]] && [[ "$has_long_motif" == "yes" ]]; then
+    {
+      echo "### ORF: $base"
+      cat "$outfile"
+      echo -e "\n\n"
+    } >> "$COMBINED_RESULTS"
+  fi
+done
+
+echo "   → Per-ORF domain reports in: $DOMAIN_OUT_DIR"
+echo "   → All domain results merged in: $COMBINED_RESULTS"
