@@ -10,57 +10,57 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-#---- 1.1 Install (or confirm) required packages ----
-#      emboss (includes getorf, patmatmotifs, seqret, prosextract, etc.)
-#      emboss-data (for built‐in DBs, though we'll override PROSITE)
-#      wget       (to fetch PROSITE files)
-echo "### Installing required packages (if not already present)..."
-sudo apt-get update -qq
-sudo apt-get install -y emboss emboss-data wget tree
-
-#---- 1.2 Set up EMBOSS_DATA for PROSITE ----
-#      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
-export EMBOSS_DATA="$HOME/emboss_data"
-PROSITE_DIR="$EMBOSS_DATA/PROSITE"
-mkdir -p "$PROSITE_DIR"
-
-#---- 1.3 Download PROSITE if not already there ----
-cd "$PROSITE_DIR"
-if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
-  echo "### Downloading PROSITE database..."
-  wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
-  wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
-else
-  echo "### PROSITE files already present, skipping download."
-fi
-
-#---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
-echo "### Running prosextract to process PROSITE..."
-# prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
-prosextract >/dev/null
-
-#----1.5 installing blast and downloading Swiss‐Prot database ----
-if ! command -v blastp &> /dev/null; then
-  echo "### Installing BLAST+..."
-  sudo apt-get install -y ncbi-blast+
-else
-  echo "### BLAST+ already installed."
-fi
-# Check if Swiss‐Prot database exists, if not, download it
-SWISSPROT_DIR="$HOME/data/swissprot"
-mkdir -p "$SWISSPROT_DIR"
+# #---- 1.1 Install (or confirm) required packages ----
+# #      emboss (includes getorf, patmatmotifs, seqret, prosextract, etc.)
+# #      emboss-data (for built‐in DBs, though we'll override PROSITE)
+# #      wget       (to fetch PROSITE files)
+# echo "### Installing required packages (if not already present)..."
+# sudo apt-get update -qq
+# sudo apt-get install -y emboss emboss-data wget tree
+#
+# #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
+# #      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
+# export EMBOSS_DATA="$HOME/emboss_data"
+# PROSITE_DIR="$EMBOSS_DATA/PROSITE"
+# mkdir -p "$PROSITE_DIR"
+#
+# #---- 1.3 Download PROSITE if not already there ----
+# cd "$PROSITE_DIR"
+# if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
+#   echo "### Downloading PROSITE database..."
+#   wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
+#   wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
+# else
+#   echo "### PROSITE files already present, skipping download."
+# fi
+#
+# #---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
+# echo "### Running prosextract to process PROSITE..."
+# # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
+# prosextract >/dev/null
+#
+# #----1.5 installing blast and downloading Swiss‐Prot database ----
+# if ! command -v blastp &> /dev/null; then
+#   echo "### Installing BLAST+..."
+#   sudo apt-get install -y ncbi-blast+
+# else
+#   echo "### BLAST+ already installed."
+# fi
+#
+# # Check if Swiss‐Prot database exists, if not, download it
+SWISSPROT_DIR="../../data/swissprot"
 if [[ ! -d "$SWISSPROT_DIR" ]]; then
   echo "### Downloading Swiss‐Prot database..."
+  mkdir -p "$SWISSPROT_DIR"
   cd "$SWISSPROT_DIR"
-  update_blastdb.pl --decompress swissprot
+  update_blastdb --decompress swissprot
+  cd -
 else
   echo "### Swiss‐Prot database already present."
 fi
 
+# Go back to main dir
 cd "$SCRIPT_DIR"
-
-
-
 ########################################################################
 # (2) Initialize global variables (paths for input/output)
 ########################################################################
@@ -170,19 +170,29 @@ echo "   → Per-ORF domain reports in: $DOMAIN_OUT_DIR"
 echo "   → All domain results merged in: $COMBINED_RESULTS"
 
 
-#Look for the longest orf inside the ORF_SPLIT_DIR 
-LONGEST_ORF=$(find "$ORF_SPLIT_DIR" -type f -name "*.fasta" -exec awk 'BEGIN{max=0} {if(length($0) > max) {max=length($0); longest=$0}} END{print longest}' {} + | sort -n | tail -n 1)
+# Find the file with the longest ORF sequence (based on total length)
+LONGEST_ORF_FASTA=$(find "$ORF_SPLIT_DIR" -name '*.fasta' -exec awk '
+  BEGIN { max_len=0; longest="" }
+  FNR==1 { seq_len=0 } 
+  /^>/ { next } 
+  { seq_len += length($0) } 
+  ENDFILE {
+    if (seq_len > max_len) {
+      max_len = seq_len
+      longest = FILENAME
+    }
+  } 
+  END { print longest }
+' {} +)
 
-# Save the longest ORF sequence to a temporary FASTA file
-LONGEST_ORF_FASTA="../../outputs/emboss/longest_orf.fasta"
-echo ">longest_orf" > "$LONGEST_ORF_FASTA"
-echo "$LONGEST_ORF" >> "$LONGEST_ORF_FASTA"
+echo "Longest ORF found: $LONGEST_ORF_FASTA"
+LONGEST_ORF_BLAST_OUT="../../outputs/emboss/longest_orf_blast.tsv"
 
 # Run BLASTp for the longest ORF
-LONGEST_ORF_BLAST_OUT="../../outputs/emboss/longest_orf_blast.tsv"
+export BLASTDB="$(realpath "$SWISSPROT_DIR")"
 blastp \
   -query "$LONGEST_ORF_FASTA" \
-  -db ../../data/swissprot/swissprot \
+  -db "swissprot" \
   -out "$LONGEST_ORF_BLAST_OUT" \
   -evalue 1e-5 \
   -outfmt '6 qseqid sseqid pident length evalue bitscore'
