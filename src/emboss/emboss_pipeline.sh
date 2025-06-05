@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+
 ########################################################################
 # (1) Get the environment ready: install tools, configure EMBOSS, etc.
 ########################################################################
@@ -15,7 +16,7 @@ cd "$SCRIPT_DIR"
 #      wget       (to fetch PROSITE files)
 echo "### Installing required packages (if not already present)..."
 sudo apt-get update -qq
-sudo apt-get install -y emboss emboss-data wget
+sudo apt-get install -y emboss emboss-data wget tree
 
 #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
 #      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
@@ -37,7 +38,28 @@ fi
 echo "### Running prosextract to process PROSITE..."
 # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
 prosextract >/dev/null
+
+#----1.5 installing blast and downloading Swiss‐Prot database ----
+if ! command -v blastp &> /dev/null; then
+  echo "### Installing BLAST+..."
+  sudo apt-get install -y ncbi-blast+
+else
+  echo "### BLAST+ already installed."
+fi
+# Check if Swiss‐Prot database exists, if not, download it
+SWISSPROT_DIR="$HOME/data/swissprot"
+mkdir -p "$SWISSPROT_DIR"
+if [[ ! -d "$SWISSPROT_DIR" ]]; then
+  echo "### Downloading Swiss‐Prot database..."
+  cd "$SWISSPROT_DIR"
+  update_blastdb.pl --decompress swissprot
+else
+  echo "### Swiss‐Prot database already present."
+fi
+
 cd "$SCRIPT_DIR"
+
+
 
 ########################################################################
 # (2) Initialize global variables (paths for input/output)
@@ -54,10 +76,14 @@ ORF_FASTA="../../outputs/emboss/orfs.fasta"
 
 # 2.4 Directory where we’ll split ORFs into individual FASTA files
 ORF_SPLIT_DIR="../../outputs/emboss/orf_splits"
+# Remove and make the directory fresh
+rm -rf "$ORF_SPLIT_DIR"
 mkdir -p "$ORF_SPLIT_DIR"
 
 # 2.5 Directory where per-ORF domain reports will go
 DOMAIN_OUT_DIR="../../outputs/emboss/per_orf_analysis"
+# Remove and make the directory fresh
+rm -rf "$DOMAIN_OUT_DIR"
 mkdir -p "$DOMAIN_OUT_DIR"
 # 2.6 File to collect all domain‐scan results in one place
 COMBINED_RESULTS="../../outputs/emboss/full_domain_analysis.txt"
@@ -143,8 +169,33 @@ done
 echo "   → Per-ORF domain reports in: $DOMAIN_OUT_DIR"
 echo "   → All domain results merged in: $COMBINED_RESULTS"
 
+
+#Look for the longest orf inside the ORF_SPLIT_DIR 
+LONGEST_ORF=$(find "$ORF_SPLIT_DIR" -type f -name "*.fasta" -exec awk 'BEGIN{max=0} {if(length($0) > max) {max=length($0); longest=$0}} END{print longest}' {} + | sort -n | tail -n 1)
+
+# Save the longest ORF sequence to a temporary FASTA file
+LONGEST_ORF_FASTA="../../outputs/emboss/longest_orf.fasta"
+echo ">longest_orf" > "$LONGEST_ORF_FASTA"
+echo "$LONGEST_ORF" >> "$LONGEST_ORF_FASTA"
+
+# Run BLASTp for the longest ORF
+LONGEST_ORF_BLAST_OUT="../../outputs/emboss/longest_orf_blast.tsv"
+blastp \
+  -query "$LONGEST_ORF_FASTA" \
+  -db ../../data/swissprot/swissprot \
+  -out "$LONGEST_ORF_BLAST_OUT" \
+  -evalue 1e-5 \
+  -outfmt '6 qseqid sseqid pident length evalue bitscore'
+
+# Add header and align columns
+sed '1i qseqid\tsseqid\tpident\tlength\tevalue\tbitscore' "$LONGEST_ORF_BLAST_OUT" | \
+  column -t -s $'\t' > "${LONGEST_ORF_BLAST_OUT}.tmp"
+mv "${LONGEST_ORF_BLAST_OUT}.tmp" "$LONGEST_ORF_BLAST_OUT"
+
+echo "   → BLASTp results for longest ORF: $LONGEST_ORF_BLAST_OUT"
+
 ########################################################################
-# (6) Done
+# () Done
 ########################################################################
 
 echo "### Pipeline complete!"
@@ -153,3 +204,7 @@ echo "  2. Translated ORFs:          $ORF_FASTA"
 echo "  3. Split ORFs:               $ORF_SPLIT_DIR"
 echo "  4. Per-ORF domain reports:   $DOMAIN_OUT_DIR"
 echo "  5. Combined domain results:  $COMBINED_RESULTS"
+echo "  6. Longest ORF BLASTp:       $LONGEST_ORF_BLAST_OUT"
+
+
+#Look for the longest orf inside the ORF_SPLIT_DIR 
