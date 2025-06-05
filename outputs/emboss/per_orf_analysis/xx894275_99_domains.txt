@@ -1,0 +1,64 @@
+########################################
+# Program: patmatmotifs
+# Rundate: Thu  5 Jun 2025 14:25:12
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/xx894275_99.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/xx894275_99_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/xx894275_99_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: XX894275_99     from: 1   to: 1274
+# HitCount: 4
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+Length = 8
+Start = position 983 of sequence
+End = position 990 of sequence
+
+Motif = ATP_GTP_A
+
+CIYLNGEPGSGKSSFFDL
+     |      |
+   983      990
+
+Length = 8
+Start = position 1239 of sequence
+End = position 1246 of sequence
+
+Motif = TYR_PHOSPHO_SITE_2
+
+LCAEFRKAFEKHYRPYDK
+     |      |
+  1239      1246
+
+Length = 8
+Start = position 1119 of sequence
+End = position 1126 of sequence
+
+Motif = TYR_PHOSPHO_SITE_2
+
+HAKNKKYPQEKAYFEDLT
+     |      |
+  1119      1126
+
+Length = 8
+Start = position 394 of sequence
+End = position 401 of sequence
+
+Motif = TYR_PHOSPHO_SITE_2
+
+GDVLIRYLSESNYFNFDY
+     |      |
+   394      401
+
+
+#---------------------------------------
+#---------------------------------------

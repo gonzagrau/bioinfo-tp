@@ -1,8 +1,0 @@
-MUSCLE:
-https://www.drive5.com/muscle/ 
-
-MAFFT:
-https://mafft.cbrc.jp/alignment/software/windows_without_cygwin.html 
-
-CLUSTAL:
-http://www.clustal.org/omega/ 

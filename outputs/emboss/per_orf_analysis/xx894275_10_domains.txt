@@ -1,0 +1,24 @@
+########################################
+# Program: patmatmotifs
+# Rundate: Thu  5 Jun 2025 14:25:11
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/xx894275_10.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/xx894275_10_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/xx894275_10_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: XX894275_10     from: 1   to: 92
+# HitCount: 0
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+
+#---------------------------------------
+#---------------------------------------

@@ -1,1 +1,0 @@
-LEP Gene Source: https://www.ncbi.nlm.nih.gov/nuccore/NC_000007.14?report=genbank&from=128241278&to=128257629

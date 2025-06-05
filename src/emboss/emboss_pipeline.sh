@@ -13,38 +13,38 @@ cd "$SCRIPT_DIR"
 #      emboss (includes getorf, patmatmotifs, seqret, prosextract, etc.)
 #      emboss-data (for built‐in DBs, though we'll override PROSITE)
 #      wget       (to fetch PROSITE files)
-# echo "### Installing required packages (if not already present)..."
-# sudo apt-get update -qq
-# sudo apt-get install -y emboss emboss-data wget
-#
-# #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
-# #      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
-# export EMBOSS_DATA="$HOME/emboss_data"
-# PROSITE_DIR="$EMBOSS_DATA/PROSITE"
-# mkdir -p "$PROSITE_DIR"
-#
-# #---- 1.3 Download PROSITE if not already there ----
-# cd "$PROSITE_DIR"
-# if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
-#   echo "### Downloading PROSITE database..."
-#   wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
-#   wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
-# else
-#   echo "### PROSITE files already present, skipping download."
-# fi
-#
-# #---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
-# echo "### Running prosextract to process PROSITE..."
-# # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
-# prosextract >/dev/null
-# cd "$SCRIPT_DIR"
-#
+echo "### Installing required packages (if not already present)..."
+sudo apt-get update -qq
+sudo apt-get install -y emboss emboss-data wget
+
+#---- 1.2 Set up EMBOSS_DATA for PROSITE ----
+#      We’ll create a local EMBOSS_DATA directory to hold PROSITE files.
+export EMBOSS_DATA="$HOME/emboss_data"
+PROSITE_DIR="$EMBOSS_DATA/PROSITE"
+mkdir -p "$PROSITE_DIR"
+
+#---- 1.3 Download PROSITE if not already there ----
+cd "$PROSITE_DIR"
+if [[ ! -f prosite.dat || ! -f prosite.doc ]]; then
+  echo "### Downloading PROSITE database..."
+  wget -q https://ftp.expasy.org/databases/prosite/prosite.dat
+  wget -q https://ftp.expasy.org/databases/prosite/prosite.doc
+else
+  echo "### PROSITE files already present, skipping download."
+fi
+
+#---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
+echo "### Running prosextract to process PROSITE..."
+# prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
+prosextract >/dev/null
+cd "$SCRIPT_DIR"
+
 ########################################################################
 # (2) Initialize global variables (paths for input/output)
 ########################################################################
 
 # 2.1 Input GenBank file (containing one or more records; we’ll extract full sequences)
-GENBANK_IN="../../data/lep-sequence.gb"
+GENBANK_IN="../../data/virus.gb"
 
 # 2.2 Intermediate/Output FASTA for whole sequence
 FULLFASTA="../../data/full_sequence.fasta"
@@ -78,9 +78,6 @@ fi
 ########################################################################
 
 echo "### Extracting full nucleotide sequence from GenBank..."
-# seqret can convert formats; here we assume the GenBank file has at least one record
-# and we want the raw nucleotide sequence in FASTA.
-# If your GenBank file has multiple records and you want only one, adjust accordingly.
 seqret -sequence "$GENBANK_IN" -out "$FULLFASTA" -osformat fasta
 
 echo "   → Full-sequence FASTA written to: $FULLFASTA"
@@ -90,7 +87,6 @@ echo "   → Full-sequence FASTA written to: $FULLFASTA"
 ########################################################################
 
 echo "### Extracting ORFs from $FULLFASTA..."
-# getorf finds all ORFs and writes them as translated protein sequences.
 # getorf finds all ORFs and writes them as translated protein sequences.
 getorf \
   -sequence "$FULLFASTA" \
@@ -130,7 +126,6 @@ for orffile in "$ORF_SPLIT_DIR"/*.fasta; do
     -outfile "$outfile" \
     >/dev/null
 
-  # Extract the HitCount value from the output file
   # Extract the HitCount value from the output file
   hit_count=$(grep -m 1 "# HitCount:" "$outfile" | awk '{print $3}')
   has_long_motif=$(awk '/Length = / {if ($3 > '"$MIN_MOTIF_LENGTH"') print "yes"; exit}' "$outfile")

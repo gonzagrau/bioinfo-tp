@@ -1,0 +1,44 @@
+########################################
+# Program: patmatmotifs
+# Rundate: Thu  5 Jun 2025 14:25:12
+# Commandline: patmatmotifs
+#    -sequence ../../outputs/emboss/orf_splits/xx894275_87.fasta
+#    -outfile ../../outputs/emboss/per_orf_analysis/xx894275_87_domains.txt
+# Report_format: dbmotif
+# Report_file: ../../outputs/emboss/per_orf_analysis/xx894275_87_domains.txt
+########################################
+
+#=======================================
+#
+# Sequence: XX894275_87     from: 1   to: 87
+# HitCount: 2
+#
+# Full: No
+# Prune: Yes
+# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+#
+#=======================================
+
+Length = 4
+Start = position 77 of sequence
+End = position 80 of sequence
+
+Motif = AMIDATION
+
+QAAVRGGRRVNRPL
+     |  |
+    77  80
+
+Length = 3
+Start = position 20 of sequence
+End = position 22 of sequence
+
+Motif = RGD
+
+RGNHHRGDGLQRK
+     | |
+    20 22
+
+
+#---------------------------------------
+#---------------------------------------
