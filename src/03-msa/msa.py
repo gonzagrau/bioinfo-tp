@@ -107,11 +107,11 @@ def run_clustalo(input_fasta, output_fasta):
 
 if __name__ == "__main__":
     # 1. Define los directorios de entrada y salida
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    fastas_folder = os.path.join(current_dir, "..", "output", "fastas")
-    output_muscle = os.path.join(current_dir, "output_muscle")
-    output_mafft = os.path.join(current_dir, "output_mafft")
-    output_clustalo = os.path.join(current_dir, "output_clustalo")
+    base_output_dir = '../../outputs/multiple-sequence-alignment'
+    fastas_folder = os.path.join(base_output_dir, "..", "output", "fastas")
+    output_muscle = os.path.join(base_output_dir, "output_muscle")
+    output_mafft = os.path.join(base_output_dir, "output_mafft")
+    output_clustalo = os.path.join(base_output_dir, "output_clustalo")
 
     print("Creando directorios de salida...")
     os.makedirs(output_muscle, exist_ok=True)
@@ -120,8 +120,8 @@ if __name__ == "__main__":
     print("Directorios creados.")
 
     # Archivos temporales para los alineamientos
-    input_dna = "../../fastas/lep-sequence_protein_sequences.fasta"
-    input_prot = "../../fastas/lep-sequence_protein_sequences.fasta"
+    input_dna = "../../outputs/fastas/joined/all_cds.fasta"
+    input_prot = "../../outputs/fastas/joined/all_proteins.fasta"
 
     # 2. Ejecuta MUSCLE, MAFFT y CLUSTALO para proteínas y ADN
     out_prot_muscle = os.path.join(output_muscle, "aln_proteins.fasta")

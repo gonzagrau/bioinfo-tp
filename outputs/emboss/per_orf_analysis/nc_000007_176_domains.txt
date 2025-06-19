@@ -1,6 +1,6 @@
 ########################################
 # Program: patmatmotifs
-# Rundate: Tue  3 Jun 2025 17:17:48
+# Rundate: Thu 19 Jun 2025 16:12:35
 # Commandline: patmatmotifs
 #    -sequence ../../outputs/emboss/orf_splits/nc_000007_176.fasta
 #    -outfile ../../outputs/emboss/per_orf_analysis/nc_000007_176_domains.txt

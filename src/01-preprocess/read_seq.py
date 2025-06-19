@@ -53,7 +53,7 @@ def extract_cds_features(record):
     return cds_features
 
 
-def save_cds_data(cds_features, record_name, output_dir="../output/fastas"):
+def save_cds_data(cds_features, record_name, output_dir="../../outputs/fastas"):
     """
     Processes and saves coding sequence (CDS) features and their associated data for a specified record into files.
     It creates two FASTA files containing both CDS sequences and their translations, and also a CSV file with CDS
@@ -91,15 +91,41 @@ def save_cds_data(cds_features, record_name, output_dir="../output/fastas"):
             f_prot.write(feature['translation'] + "\n")
 
 
+def make_joinded_files(output_dir="../../outputs/fastas"):
+    """
+    Joins all CDS and protein FASTA files into single files for each type.
+    This function assumes that the output directory contains the individual CDS and protein files.
+
+    :param output_dir: The directory where the output files are saved. Defaults to 'output'.
+    :type output_dir: str
+    :return: None
+    """
+    cds_files = [f for f in os.listdir(output_dir) if f.endswith("_cds.fasta")]
+    prot_files = [f for f in os.listdir(output_dir) if f.endswith("_protein.fasta")]
+    joined_dir = os.path.join(output_dir, "joined")
+    if not os.path.exists(joined_dir):
+        os.makedirs(joined_dir)
+
+    with open(os.path.join(joined_dir, "all_cds.fasta"), "w") as f_cds_all:
+        for cds_file in cds_files:
+            with open(os.path.join(output_dir, cds_file)) as f_cds:
+                f_cds_all.write(f_cds.read())
+
+    with open(os.path.join(joined_dir, "all_proteins.fasta"), "w") as f_prot_all:
+        for prot_file in prot_files:
+            with open(os.path.join(output_dir, prot_file)) as f_prot:
+                f_prot_all.write(f_prot.read())
+
+
 def main():
-    for file in os.listdir("../data"):
+    for file in os.listdir("../../data"):
         # Skip irrelevant files
         if not file.endswith(".gb") or file.endswith(".gbk"):
             continue
 
         record_name = file.split(".")[0]
         print(f"Reading GenBank file: {record_name}")
-        with open(os.path.join("../data", file)) as handle:
+        with open(os.path.join("../../data", file)) as handle:
             record = SeqIO.read(handle, format="genbank")
 
         cds_features = extract_cds_features(record)
@@ -118,6 +144,12 @@ def main():
         # Save data to files
         save_cds_data(cds_features, record_name)
         print(f"CDS data saved to the 'output' directory.")
+
+    # Join all CDS and protein files into single files
+    make_joinded_files(output_dir="../../outputs/fastas")
+    print("Joined CDS and protein files created in the 'joined' directory.")
+
+
 
 
 if __name__ == "__main__":
