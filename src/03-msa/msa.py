@@ -120,8 +120,8 @@ if __name__ == "__main__":
     print("Directorios creados.")
 
     # Archivos temporales para los alineamientos
-    input_dna = "../fastas/lep-sequence_protein_sequences.fasta"
-    input_prot = "../fastas/lep-sequence_protein_sequences.fasta"
+    input_dna = "../../fastas/lep-sequence_protein_sequences.fasta"
+    input_prot = "../../fastas/lep-sequence_protein_sequences.fasta"
 
     # 2. Ejecuta MUSCLE, MAFFT y CLUSTALO para proteínas y ADN
     out_prot_muscle = os.path.join(output_muscle, "aln_proteins.fasta")
