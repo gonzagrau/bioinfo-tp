@@ -3,42 +3,31 @@
 # MSA Bash Script
 # This script runs multiple sequence alignment tools (MUSCLE, MAFFT, Clustal Omega)
 # on DNA and protein sequences.
+# Ensure the script is run from the correct directory
+
+cd "$(dirname "$0")" || exit 1
+# Install required tools if not already installed
+if ! command -v muscle &> /dev/null; then
+    echo "MUSCLE not found, installing..."
+    sudo apt-get install muscle -y
+else
+    echo "MUSCLE is already installed."
+fi
+if ! command -v mafft &> /dev/null; then
+    echo "MAFFT not found, installing..."
+    sudo apt-get install mafft -y
+else
+    echo "MAFFT is already installed."
+fi
+if ! command -v clustalo &> /dev/null; then
+    echo "Clustal Omega not found, installing..."
+    sudo apt-get install clustalo -y
+else
+    echo "Clustal Omega is already installed."
+fi
 
 # Set up logging
 echo "Starting MSA script..."
-
-# Find binaries
-find_binary() {
-    local name=$1
-    local path=$(which $name)
-    if [ -n "$path" ]; then
-        echo $path
-        return
-    fi
-    
-    # Common Linux binary locations to check
-    local locations=(
-        "/usr/bin/$name"
-        "/usr/local/bin/$name"
-        "/opt/$name/$name"
-    )
-    
-    for loc in "${locations[@]}"; do
-        if [ -f "$loc" ] && [ -x "$loc" ]; then
-            echo $loc
-            return
-        fi
-    done
-    
-    # Use the name and hope it's in PATH
-    echo $name
-}
-
-echo "Looking for alignment binaries..."
-MUSCLE_BIN=$(find_binary "muscle")
-MAFFT_BIN=$(find_binary "mafft")
-CLUSTALO_BIN=$(find_binary "clustalo")
-echo "Found binaries: MUSCLE: $MUSCLE_BIN, MAFFT: $MAFFT_BIN, Clustal Omega: $CLUSTALO_BIN"
 
 # Define input and output directories
 BASE_OUTPUT_DIR="../../outputs/multiple-sequence-alignment"
@@ -74,14 +63,7 @@ run_muscle() {
     
     # Check if input file exists and is not empty
     if [ -f "$input" ] && [ -s "$input" ]; then
-        # Check MUSCLE version to determine command format
-        if [[ "$MUSCLE_BIN" == *"5"* ]] || [[ "$($MUSCLE_BIN -h 2>&1)" == *"-align"* ]]; then
-            $MUSCLE_BIN -align "$input" -output "$output"
-        else
-            # Older MUSCLE versions
-            $MUSCLE_BIN -in "$input" -out "$output"
-        fi
-        
+        muscle -in "$input" -out "$output"
         if [ $? -eq 0 ]; then
             echo "MUSCLE executed successfully, results in: $output"
         else
@@ -100,7 +82,7 @@ run_mafft() {
     
     # Check if input file exists and is not empty
     if [ -f "$input" ] && [ -s "$input" ]; then
-        $MAFFT_BIN --auto "$input" > "$output"
+        mafft --auto "$input" > "$output"
         
         if [ $? -eq 0 ]; then
             echo "MAFFT executed successfully, results in: $output"
@@ -120,7 +102,7 @@ run_clustalo() {
     
     # Check if input file exists and is not empty
     if [ -f "$input" ] && [ -s "$input" ]; then
-        $CLUSTALO_BIN -i "$input" -o "$output" --force --outfmt=fasta
+        clustalo -i "$input" -o "$output" --force --outfmt=fasta
         
         if [ $? -eq 0 ]; then
             echo "Clustal Omega executed successfully, results in: $output"
