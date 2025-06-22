@@ -40,4 +40,8 @@ for fasta in ../../outputs/fastas/*_protein.fasta; do
         "../../outputs/blast_results/results_${accession}.tsv" | \
             column -t -s $'\t' > "../../outputs/blast_results/results_${accession}.tmp.tsv"
         mv "../../outputs/blast_results/results_${accession}.tmp.tsv" "../../outputs/blast_results/results_${accession}.tsv"
+
+    echo "BLASTp results for $accession saved to ../../outputs/blast_results/results_${accession}.tsv"
 done
+
+echo "### BLASTp processing completed for all sequences."
