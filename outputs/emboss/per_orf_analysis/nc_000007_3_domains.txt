@@ -1,6 +1,6 @@
 ########################################
 # Program: patmatmotifs
-# Rundate: Thu 19 Jun 2025 16:12:36
+# Rundate: Tue 24 Jun 2025 15:15:18
 # Commandline: patmatmotifs
 #    -sequence ../../outputs/emboss/orf_splits/nc_000007_3.fasta
 #    -outfile ../../outputs/emboss/per_orf_analysis/nc_000007_3_domains.txt
@@ -15,7 +15,7 @@
 #
 # Full: No
 # Prune: Yes
-# Data_file: /home/gonzagrau/emboss_data/PROSITE/prosite.lines
+# Data_file: /home/gonzagrau/miniconda3/envs/bioinfo/bin/../share/EMBOSS/data/PROSITE/prosite.lines
 #
 #=======================================
 

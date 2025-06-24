@@ -11,7 +11,7 @@ cd "$SCRIPT_DIR"
 
 #---- 1.1 Install (or confirm) required packages ----
  echo "### Installing required packages (if not already present)..."
- sudo apt-get update -qq
+ # sudo apt update >/dev/null 2>&1 || true
  sudo apt-get install -y emboss emboss-data wget
 
  #---- 1.2 Set up EMBOSS_DATA for PROSITE ----
@@ -33,7 +33,7 @@ cd "$SCRIPT_DIR"
  #---- 1.4 Run prosextract so that patmatmotifs can use PROSITE ----
  echo "### Running prosextract to process PROSITE..."
  # prosextract will write files like prosite.pat, prosite.lines, etc., under $PROSITE_DIR
- prosextract >/dev/null
+ prosextract -prositedir . >/dev/null
  cd "$SCRIPT_DIR"
 
 ########################################################################
@@ -137,6 +137,7 @@ for orffile in "$ORF_SPLIT_DIR"/*.fasta; do
       cat "$outfile"
       echo -e "\n\n"
     } >> "$COMBINED_RESULTS"
+    echo "Found motif matches for ORF $base"
   fi
 done
 
