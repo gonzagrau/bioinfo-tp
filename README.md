@@ -39,3 +39,21 @@ Install requirements with:
 ```bash
 pip install -r requirements.txt
 ```
+
+## Automated pipeline
+
+To run the entire analysis (preprocessing, BLAST search and multiple sequence
+alignment) in one command, execute the `run_pipeline.sh` script from the project
+root:
+
+```bash
+bash run_pipeline.sh
+```
+
+The script installs the required Python packages and sequentially runs:
+
+1. `src/01-preprocess/read_seq.py`
+2. `src/02-BLAST/blast_script.sh`
+3. `src/03-msa/msa.sh`
+
+Results will be stored inside the `outputs` directory.
