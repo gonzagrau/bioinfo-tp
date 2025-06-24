@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+pip install --quiet biopython==1.85 primer3-py==2.2.0
+
 # Resolve paths relative to this script's location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FASTA_DIR="$SCRIPT_DIR/../../outputs/fastas"

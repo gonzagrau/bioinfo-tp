@@ -36,3 +36,6 @@ The script installs the required Python packages and sequentially runs:
 3. `src/03-msa/msa.sh`
 
 Results will be stored inside the `outputs` directory.
+
+To run the `src/05-primers` use the `src/05-primers/run_design_primers.sh` bash script, 
+it installs the required libraries for the Python file and also iterates over the Fasta sequences.
