@@ -1,6 +1,18 @@
 #!/bin/bash
 set -e # makes the script exit immediately if any command returns a non-zero
 
+# Install BLAST+ if not already present
+if ! command -v blastp >/dev/null 2>&1; then
+    echo "### Installing NCBI BLAST+..."
+    if command -v apt-get >/dev/null 2>&1; then
+        apt-get update -y
+        apt-get install -y ncbi-blast+
+    else
+        echo "Error: apt-get not available. Please install NCBI BLAST+ manually." >&2
+        exit 1
+    fi
+fi
+
 # Prepare environment
 SWISSPROT_DIR="../../data/swissprot"
 if [[ ! -d "$SWISSPROT_DIR" ]]; then
